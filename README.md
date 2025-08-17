@@ -197,12 +197,26 @@ docker-compose ps
 nginx, php, mysql, phpmyadmin が Up になっていればOK
 
 3. Laravel プロジェクト作成
-
+10系の最新安定版
 ```bash
 docker-compose exec php composer create-project laravel/laravel:^10.0 .
 ```
 ./src に Laravel プロジェクトが作成される<br>
 （PHP-FPM コンテナ内で Composer を実行しているので依存関係も正しくインストールされる）
+
+8系固定なら
+```php
+composer create-project "laravel/laravel=8.*" . --prefer-dist
+```
+Laravel はバージョンごとにルーティング、コントローラの書き方、認証周りなど結構変わります。
+
+例えば Laravel 9 以降は ルート定義で use 文が不要になったり、PHP の要求バージョンも上がったり します。
+
+教材どおりに進めるなら 8系固定のほうが無難
+（採点システムや動作検証も「8系前提」になっている可能性があります）
+
+新しい環境に慣れたいなら 10系
+（ただし教材のコードと違う部分が出てくる）
 
 4. Nginx / PHP-FPM 接続確認
 
@@ -291,3 +305,48 @@ docker system prune -a
 
 ディスク容量が膨らんできたときの大掃除用
 
+### error対処
+`docker-compose up -d --build` で
+```vbnet
+! phpmyadmin The requested image's platform (linux/amd64) does not match the detected host platform (linux/arm64/v8) and no specific platform was requested
+```
+あなたの MacBook Air (M1/M2 → ARM64) と、公式 phpMyAdmin イメージ（phpmyadmin/phpmyadmin → amd64優先）のアーキテクチャが違うために出る警告。
+
+ただし `docker-compose ps` で
+
+phpMyAdmin コンテナは 正常に起動してポート8080を公開できればOK。<br>
+→ 実際にブラウザで http://localhost:8080 を開けるなら 動作上は問題なし。
+
+開けなければ、<br>
+「docker-compose.yml」の「phpmyadmin」サービスに以下を追加：
+```yaml
+phpmyadmin:
+  image: phpmyadmin/phpmyadmin
+  platform: linux/arm64/v8   # ← ここを追加
+  ports:
+    - "8080:80"
+```
+👉 これで警告は消えるはず。再ビルドしてみる。
+
+`docker-compose up -d --build`で最初の方に出る警告
+```vbnet
+WARN[0000] /Users/ainyan4869/coachtech/test/docker-compose.yml: the attribute version is obsolete, it will be ignored, please remove it to avoid potential confusion
+```
+Docker Compose の v2 以降 では、docker-compose.yml の version: '3.9' は 不要 になっています。
+
+書いてあっても無視されるため、警告が出ています。
+
+
+
+### 実際のテスト用md
+```
+docker-compose up -d --build
+
+docker-compose exec php bash
+
+composer -v
+
+composer create-project "laravel/laravel=8.*" . --prefer-dist
+
+ls
+```
