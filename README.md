@@ -339,14 +339,93 @@ Docker Compose の v2 以降 では、docker-compose.yml の version: '3.9' は 
 
 
 ### 実際のテスト用md
-```
+```md
+git clone リンク
+
 docker-compose up -d --build
 
 docker-compose exec php bash
 
-composer -v
+composer install
+<!-- composer -v -->
 
+cp .env.example .env
+
+<!-- .envを編集 -->
+
+php artisan key:generate
+
+```
+
+```
+<!-- プロジェクト作成済みなので必要なし -->
 composer create-project "laravel/laravel=8.*" . --prefer-dist
-
 ls
 ```
+
+
+.envファイルはプロジェクト完成後に`git clone`してから作成してもらう。
+
+phpコンテナ内
+
+```php
+cp .env.example .env
+exit
+```
+環境変数を変更
+```env
+// 前略
+
+DB_CONNECTION=mysql
+- DB_HOST=127.0.0.1
++ DB_HOST=mysql
+DB_PORT=3306
+- DB_DATABASE=laravel
+- DB_USERNAME=root
+- DB_PASSWORD=
++ DB_DATABASE=laravel_db
++ DB_USERNAME=laravel_user
++ DB_PASSWORD=laravel_pass
+
+// 後略
+
+```
+
+
+<!-- プロジェクト作成済みなので必要なし -->
+config/app.php の70行目付近のタイムゾーンが`Asia/Tokyo`になっているか確認(Laravel基礎1-3)
+
+
+
+※ .gitgnore の /vendor を /vendor/ に修正する<br>
+vendorディレクトリ内を空の状態で git clone できるので、後から`composer install`できる。
+
+composer.json と composer.lock のみ Git 管理
+これらは依存パッケージの定義ファイルです。
+
+composer.json → 開発者が指定した依存関係（例: Laravel 8.x）
+
+composer.lock → インストール時に固定された具体的バージョン
+
+チームメンバーが composer install を実行すると lock に従って全員同じバージョンで揃います。
+
+
+php artisan key:generate とは？
+Laravel のアプリケーションキー（APP_KEY）を生成・設定するコマンドです。
+
+役割
+暗号化やセッション管理に使われる ランダムな32文字のキーを .env に書き込む
+
+アプリの安全性に直結（これがないと暗号化機能やログインセッションが壊れる）
+
+.env に以下のように書き込まれます：
+```env
+APP_KEY=base64:xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx=
+```
+
+いつ必要？
+プロジェクトを新規作成したとき (laravel new や composer create-project)
+
+GitHubなどから .env.example しかない状態でクローンしてきたとき
+（.env をコピーしてから php artisan key:generate が必要）
+
