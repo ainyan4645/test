@@ -342,6 +342,8 @@ Docker Compose の v2 以降 では、docker-compose.yml の version: '3.9' は 
 ```md
 git clone リンク
 
+cd < my-repo >
+
 docker-compose up -d --build
 
 docker-compose exec php bash
@@ -349,14 +351,21 @@ docker-compose exec php bash
 composer install
 <!-- composer -v -->
 
+exit
+cd src
+
 cp .env.example .env
 
 <!-- .envを編集 -->
 
+docker-compose exec php bash
+
 php artisan key:generate
 
 ```
-
+```
+docker-compose exec php bash -c "composer install && php artisan key:generate && php artisan migrate --seed"
+```
 ```
 <!-- プロジェクト作成済みなので必要なし -->
 composer create-project "laravel/laravel=8.*" . --prefer-dist
@@ -394,6 +403,7 @@ DB_PORT=3306
 
 <!-- プロジェクト作成済みなので必要なし -->
 config/app.php の70行目付近のタイムゾーンが`Asia/Tokyo`になっているか確認(Laravel基礎1-3)
+tinkerで時刻も確認しておくと良い
 
 
 
@@ -401,6 +411,7 @@ config/app.php の70行目付近のタイムゾーンが`Asia/Tokyo`になって
 vendorディレクトリ内を空の状態で git clone できるので、後から`composer install`できる。
 
 composer.json と composer.lock のみ Git 管理
+
 これらは依存パッケージの定義ファイルです。
 
 composer.json → 開発者が指定した依存関係（例: Laravel 8.x）
@@ -429,3 +440,8 @@ APP_KEY=base64:xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx=
 GitHubなどから .env.example しかない状態でクローンしてきたとき
 （.env をコピーしてから php artisan key:generate が必要）
 
+Laravelのバージョン確認
+```
+cat src/composer.lock | grep -A 2 '"name": "laravel/framework"'
+```
+または、composer.lock ファイルの”packages”内で確認もできる(たくさんあって見つけにくい)
