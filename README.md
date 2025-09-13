@@ -218,7 +218,22 @@ Laravel はバージョンごとにルーティング、コントローラの書
 新しい環境に慣れたいなら 10系
 （ただし教材のコードと違う部分が出てくる）
 
-4. Nginx / PHP-FPM 接続確認
+4. タイムゾーンの編集
+src/config/app.php 70行目付近の'timezone'を'Asia/Tokyo'に変更する。
+```php
+'timezone' => 'UTC',
+// 変更後↓
+'timezone' => 'Asia/Tokyo',
+```
+PHPコンテナ内で時刻を確認
+```php
+php artisan tinker
+echo Carbon\Carbon::now();
+// 時刻が合わない場合は設定を更新してみる↓
+php artisan config:clear
+```
+
+5. Nginx / PHP-FPM 接続確認
 
 ブラウザで確認
 ```arduino
@@ -230,7 +245,7 @@ Laravel の初期画面が出ればOK<br>
 docker-compose logs nginx
 ```
 
-5. MySQL 接続確認
+6. MySQL 接続確認
 
 phpMyAdmin から
 ```arduino
@@ -250,9 +265,10 @@ mysql -u laravel_user -p
 ```
 SHOW DATABASES; で laravel_db が見えればOK
 
-6. Laravel DB 接続確認
+7. Laravel DB 接続確認
 
-.env を編集（DB設定を Docker に合わせる）
+.env と .env.example を編集（DB設定を Docker に合わせる）
+.env.example も編集しておくことで、他者がgit cloneしたときに.envファイルを編集しなくて済む
 ```env
 DB_CONNECTION=mysql
 DB_HOST=mysql
@@ -267,7 +283,7 @@ docker-compose exec php php artisan migrate
 ```
 エラーが出ずにテーブルが作成されればOK
 
-7. 停止・削除（必要に応じて）
+8. 停止・削除（必要に応じて）
 
 ```bash
 docker-compose down
