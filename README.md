@@ -461,3 +461,15 @@ Laravelのバージョン確認
 cat src/composer.lock | grep -A 2 '"name": "laravel/framework"'
 ```
 または、composer.lock ファイルの”packages”内で確認もできる(たくさんあって見つけにくい)
+
+
+### Fortify導入
+PHPコンテナ内で以下を実行
+```php
+composer require laravel/fortify
+php artisan vendor:publish --provider="Laravel\Fortify\FortifyServiceProvider"
+```
+※この後にマイグレーションを実行する
+
+その他の設定はLaravelのユーザ認証の教材を確認する。<br>
+GitHubで共有されたユーザはcomposer installだけで完結できる。
