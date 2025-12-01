@@ -197,7 +197,10 @@ docker-compose ps
 nginx, php, mysql, phpmyadmin が Up になっていればOK
 
 3. Laravel プロジェクト作成
-10系の最新安定版
+
+./src に移動後、
+
+10系の最新安定版を入れる
 ```bash
 docker-compose exec php composer create-project laravel/laravel:^10.0 .
 ```
@@ -218,7 +221,7 @@ Laravel はバージョンごとにルーティング、コントローラの書
 新しい環境に慣れたいなら 10系
 （ただし教材のコードと違う部分が出てくる）
 
-4. タイムゾーンの編集
+1. タイムゾーンの編集
 src/config/app.php 70行目付近の'timezone'を'Asia/Tokyo'に変更する。
 ```php
 'timezone' => 'UTC',
@@ -233,7 +236,7 @@ echo Carbon\Carbon::now();
 php artisan config:clear
 ```
 
-5. Nginx / PHP-FPM 接続確認
+1. Nginx / PHP-FPM 接続確認
 
 ブラウザで確認
 ```arduino
